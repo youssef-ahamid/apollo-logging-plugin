@@ -1,35 +1,41 @@
 {
-  "name": "<package>",
-  "version": "0.0.1",
+  "name": "apollo-logging-plugin",
+  "version": "1.0.0",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
-  "description": "<description>",
+  "description": "Colorful Logs for your Apollo GraphQL server",
   "scripts": {
-    "dev": "vitest",
-    "test": "vitest run",
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "lint": "tsc",
     "format": "prettier --config .prettierrc --write .",
-    "clean": "pnpm run format && pnpm run lint && pnpm run test",
-    "release-no-test": "pnpm run build && changeset publish",
-    "release": "pnpm run clean && pnpm run build && changeset && changeset version && changeset publish"
+    "clean": "pnpm run format && pnpm run lint",
+    "change": "changeset && changeset version",
+    "release": "pnpm run clean && pnpm run build && changeset publish"
   },
   "keywords": [
-    "typescript"
+    "typescript",
+    "apollo",
+    "logging",
+    "graphql",
+    "server",
+    "apollo-server"
   ],
-  "author": "<Your Name>",
+  "author": "Youssef Abdelhamid",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/<username>/<repo>.git"
+    "url": "https://github.com/youssef-ahamid/apollo-logging-plugin.git"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.0",
     "prettier": "^2.8.4",
     "tsup": "^6.5.0",
-    "typescript": "^4.9.5",
-    "vitest": "^0.28.4",
-    "zod": "^3.20.2"
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.5.0",
+    "chalk": "^5.2.0",
+    "graphql": "^16.6.0"
   }
 }
