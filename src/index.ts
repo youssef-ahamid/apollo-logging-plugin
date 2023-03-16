@@ -1,4 +1,4 @@
-import chalk, { ColorName } from 'chalk';
+import chalk, { type ColorName } from 'chalk';
 import {
   ApolloServerPlugin,
   BaseContext,
@@ -18,98 +18,66 @@ const logColors = new Map<LogType, ColorName>([
 ]);
 
 /**
- * Log class
- * Logs colorful messages to the console
+ * Print a log message to the console
+ * @param {LogType} level or color
+ * @param {GraphQLRequestContext<BaseContext>} data
+ * @param {string} message
  *
  * @example
  * const log = new Log();
  * log.print('info', context, "Info Message");
+ */
+async function print(
+  level: LogType,
+  data: GraphQLRequestContext<BaseContext>,
+  message?: string
+) {
+  if (data.operationName === 'IntrospectionQuery') return;
+
+  const operationInfo = `${data.operation?.name?.value || 'unknown'} ${
+    data.operation?.operation ?? ''
+  }`;
+  const text = `${message ? '- ' + message : ''}`;
+  const timestamp =
+    '[' + new Date().toISOString().split('T').join(' ').slice(0, -5) + ']';
+  const errors = data.errors
+    ? `\nErrors: \n${data.errors.map((error) => error.message).join('\n')}`
+    : '';
+
+  console.log(
+    chalk[logColors.get(level) as ColorName](
+      `${operationInfo} ${text} ${level} ${timestamp} ${errors}`
+    )
+  );
+}
+
+/**
+ * Create a Logger
+ *
+ * Logs colorful messages to the console
+ *
+ * @example
+ * const log = makeLog("info", "error", "success");
  * log.error(context, "Error Message");
  * log.success(context, "Success Message");
  * log.info(context, "Info Message");
  */
-class Log {
-  constructor() {}
+const makeLog = <T extends LogType[]>(...types: T) =>
+  Object.fromEntries(
+    types.map((type) => [
+      type,
+      (context: GraphQLRequestContext<BaseContext>, message?: string) =>
+        print(type, context, message)
+    ])
+  ) as unknown as Record<
+    T[number],
+    (
+      context: GraphQLRequestContext<BaseContext>,
+      message?: string
+    ) => Promise<void>
+  >;
 
-  /**
-   * Print a log message to the console
-   * @param {LogType} level
-   * @param {GraphQLRequestContext<BaseContext>} data
-   * @param {string} message
-   *
-   * @example
-   * const log = new Log();
-   * log.print('info', context, "Info Message");
-   */
-  public print = (
-    level: LogType,
-    data: GraphQLRequestContext<BaseContext>,
-    message?: string
-  ) => {
-    if (data.operationName === 'IntrospectionQuery') return;
-
-    const operationInfo = `${data.operation?.name?.value || 'unknown'} ${
-      data.operation?.operation ?? ''
-    }`;
-    const text = `${message ? '- ' + message : ''} - ${level}`;
-    const timestamp =
-      '[' + new Date().toISOString().split('T').join(' ').slice(0, -5) + ']';
-    const errors = data.errors
-      ? `\nErrors: \n${data.errors.map((error) => error.message).join('\n')}`
-      : '';
-
-    console.log(
-      chalk[logColors.get(level) as ColorName](
-        `${operationInfo} ${text} ${timestamp} ${errors}`
-      )
-    );
-  };
-
-  /**
-   * Log an error message
-   * @param {GraphQLRequestContext<BaseContext>} context
-   * @param {string} message
-   * @example
-   * const log = new Log();
-   * log.error(context, "Error Message");
-   */
-  public async error(
-    context: GraphQLRequestContext<BaseContext>,
-    message?: string
-  ) {
-    this.print('error', context, message);
-  }
-
-  /**
-   * Log a success message
-   * @param {GraphQLRequestContext<BaseContext>} context
-   * @param {string} message
-   * @example
-   * const log = new Log();
-   * log.success(context, "Success Message");
-   */
-  public async success(
-    context: GraphQLRequestContext<BaseContext>,
-    message?: string
-  ) {
-    this.print('success', context, message);
-  }
-
-  /**
-   * Log an info message
-   * @param {GraphQLRequestContext<BaseContext>} context
-   * @param {string} message
-   * @example
-   * const log = new Log();
-   * log.info(context, "Info Message");
-   */
-  public async info(
-    context: GraphQLRequestContext<BaseContext>,
-    message?: string
-  ) {
-    this.print('info', context, message);
-  }
-}
+type Log = ReturnType<typeof makeLog>;
 
 /**
  * Apollo Logging Plugin
@@ -149,7 +117,7 @@ class Log {
 export const ApolloLogPlugin = (
   handlers?: (log: Log) => GraphQLRequestListener<BaseContext>
 ): ApolloServerPlugin => {
-  const log = new Log();
+  const log = makeLog('info', 'error', 'success');
 
   const baseHandlers: GraphQLRequestListener<BaseContext> = {};
 

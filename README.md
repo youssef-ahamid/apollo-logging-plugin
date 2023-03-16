@@ -1,6 +1,6 @@
 # Apollo Logging Plugin
 
-Adds colorful logs to your Apollo Server. 
+Adds colorful logs to your Apollo Server.
 
 ## Installation
 

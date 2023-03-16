@@ -1,5 +1,11 @@
 # apollo-logging-plugin
 
+## 1.0.1
+
+### Patch Changes
+
+- Minor improvement to logging interface.
+
 ## 1.0.0
 
 ### Major Changes
