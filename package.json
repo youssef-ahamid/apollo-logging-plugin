@@ -1,0 +1,35 @@
+{
+  "name": "<package>",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "description": "<description>",
+  "scripts": {
+    "dev": "vitest",
+    "test": "vitest run",
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "lint": "tsc",
+    "format": "prettier --config .prettierrc --write .",
+    "clean": "pnpm run format && pnpm run lint && pnpm run test",
+    "release-no-test": "pnpm run build && changeset publish",
+    "release": "pnpm run clean && pnpm run build && changeset && changeset version && changeset publish"
+  },
+  "keywords": [
+    "typescript"
+  ],
+  "author": "<Your Name>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/<username>/<repo>.git"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.26.0",
+    "prettier": "^2.8.4",
+    "tsup": "^6.5.0",
+    "typescript": "^4.9.5",
+    "vitest": "^0.28.4",
+    "zod": "^3.20.2"
+  }
+}
